@@ -14,3 +14,4 @@ df4 = pd.DataFrame({
 df4.plot.hist(alpha=0.5)  # 指定图形透明度
 df4.plot.hist(stacked=True, bins=20)  # 堆叠并指定箱数为20
 df4.diff().hist()  # 通过diff给每一列数据都绘制一个直方图
+plt.show()
