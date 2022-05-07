@@ -1,41 +1,29 @@
 import matplotlib.pyplot as plt
-import mglearn.plots
-import numpy as np
-from sklearn.datasets import make_blobs
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
+cancer = load_breast_cancer()
+X_train, X_test, y_train, y_test = train_test_split(cancer.data, cancer.target,
+                                                    stratify=cancer.target,
+                                                    random_state=66)
 
-def make_forge():
-    # a carefully hand-designed dataset lol
-    X, y = make_blobs(centers=2, random_state=4, n_samples=30)
-    y[np.array([7, 27])] = 0
-    mask = np.ones(len(X), dtype=np.bool_)
-    mask[np.array([0, 1, 5, 26])] = 0
-    X, y = X[mask], y[mask]
-    return X, y
+training_accuracy = []
+test_accuracy = []
 
+neighbors_settings = range(1, 11)
 
-new_X, new_y = make_forge()
+for n_neighbors in neighbors_settings:
+    clf = KNeighborsClassifier(n_neighbors=n_neighbors)
+    clf.fit(X_train, y_train)
+    training_accuracy.append(clf.score(X_train, y_train))
+    test_accuracy.append(clf.score(X_test, y_test))
 
-"""
-print(new_X.shape)
+plt.plot(neighbors_settings, training_accuracy, label="training accuracy")
+plt.plot(neighbors_settings, test_accuracy, label="test accuracy")
+plt.title("brest cancer")
+plt.ylabel("Accuracy")
+plt.xlabel("n_neighbors")
 
-X_train, X_test, y_train, y_test = train_test_split(new_X, new_y, random_state=0)
-
-clf = KNeighborsClassifier(n_neighbors=3)
-
-clf.fit(X_train, y_train)
-"""
-
-fig, axes = plt.subplots(1, 3, figsize=(10, 3))
-
-for n_neighbors, ax in zip([1, 3, 9], axes):
-    clf = KNeighborsClassifier(n_neighbors=n_neighbors).fit(new_X, new_y)
-    mglearn.plots.plot_2d_separator(clf, new_X, fill=True, eps=0.5, ax=ax, alpha=.4)
-    mglearn.discrete_scatter(new_X[:, 0], new_X[:, 1], new_y, ax=ax)
-    ax.set_title("{} neighbor(s)".format(n_neighbors))
-    ax.set_xlabel("feature 0")
-    ax.set_ylabel("feature 1")
-
-axes[0].legend(loc=3)
+plt.legend()
 plt.show()
