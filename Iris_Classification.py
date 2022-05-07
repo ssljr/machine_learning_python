@@ -1,8 +1,8 @@
+import numpy as np
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
-import pandas as pd
-import mglearn
-import matplotlib.pyplot as plt
+from sklearn.neighbors import KNeighborsClassifier
+import joblib
 
 """模拟一个鸢尾花分类模型"""
 
@@ -11,10 +11,20 @@ data_iris = load_iris()
 
 X_train, X_test, y_train, y_test = train_test_split(data_iris['data'], data_iris['target'], random_state=0)
 
-iris_dataframe = pd.DataFrame(X_train, columns=data_iris.feature_names)
+"""训练模型
+knn = KNeighborsClassifier(n_neighbors=1)
+knn.fit(X_train, y_train)
 
-grr = pd.plotting.scatter_matrix(iris_dataframe, c=y_train, figsize=(10, 10), marker='o', hist_kwds={'bins': 20},
-                                 s=60,
-                                 alpha=.8, cmap=mglearn.cm3)
+joblib.dump(knn, "saved_models/knn.bin")
+"""
+# 测试模型
+X_new = np.array([[6.0, 2, 5, 1.8]])
+print("X_new shape {}".format(X_new.shape))
+model = joblib.load("saved_models/knn.bin")
 
-plt.show()
+prediction = model.predict(X_new)
+print("X_new prediction: {}".format(prediction))
+print("predicted target name: {}".format(data_iris['target_names'][prediction]))
+
+# 评估模型
+print("score: {}".format(model.score(X_test, y_test)))
